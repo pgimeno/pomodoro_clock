@@ -56,16 +56,27 @@ ThemeData CustomLightTheme() {
         fontSize: 26,
         color: Colors.black,
       ),
-      bodyMedium: base.textTheme.bodyLarge?.copyWith(
+      bodyMedium: base.textTheme.bodyMedium?.copyWith(
         fontSize: 18,
         color: Colors.black,
       ),
-      bodySmall: base.textTheme.bodyLarge?.copyWith(
+      bodySmall: base.textTheme.bodySmall?.copyWith(
         fontSize: 14,
         color: Colors.black,
       ),
     ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.white,
+        backgroundColor: kDarkBackground,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(50.0),
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 15.0),
+      ),
+    ),
     scaffoldBackgroundColor: kLightBackground,
+    floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: kDarkBackground, foregroundColor: kLightBackground),
     //textTheme: TextTheme(
     //bodyMedium:
   );
