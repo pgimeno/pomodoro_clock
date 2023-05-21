@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:pomodoro_clock/utils/themes.dart';
 import 'package:provider/provider.dart';
 import '../utils/constants.dart';
-import 'package:sleek_circular_slider/sleek_circular_slider.dart';
-
 import '../utils/theme_provider.dart';
+import 'timer_screen.dart';
 
 void main() {
   runApp(ChangeNotifierProvider(
@@ -21,8 +20,6 @@ class MainApp extends StatefulWidget {
 }
 
 bool _iconBool = false;
-IconData _iconLight = Icons.wb_sunny;
-IconData _iconDark = Icons.nights_stay;
 
 class _MainAppState extends State<MainApp> {
   void _toggleTheme() {
@@ -46,7 +43,6 @@ class _MainAppState extends State<MainApp> {
 }
 
 class MainScreen extends StatefulWidget {
-
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
@@ -55,6 +51,13 @@ class _MainScreenState extends State<MainScreen> {
   int _focusInterval = 25;
   int _restDuration = 5;
   int _longBreakDuration = 20;
+  int _currentQuestionIndex = 0;
+  List<String> _questions = [
+    'Set the duration for each focus interval.',
+    'Set the duration for short breaks.',
+    'Set the duration for the long break.'
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,9 +74,7 @@ class _MainScreenState extends State<MainScreen> {
             icon: Icon(Provider.of<ThemeProvider>(context).currentTheme == ThemeMode.dark
                 ? Icons.wb_sunny
                 : Icons.nights_stay),
-
           )
-
         ],
       ),
       body: SafeArea(
@@ -81,118 +82,129 @@ class _MainScreenState extends State<MainScreen> {
           padding: const EdgeInsets.all(18.0),
           child: Center(
             child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Text('Set the duration for each focus interval.',
-                      style: Provider.of<ThemeProvider>(context).currentTheme == ThemeMode.dark
-                          ? CustomDarkTheme().textTheme.bodyLarge
-                          : CustomLightTheme().textTheme.bodyLarge),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      FloatingActionButton(
-                          heroTag: "fab1",
-                          child: Icon(Icons.remove),
-                          onPressed: () {
-                            setState(() {
-                              if (_focusInterval > 5) {
-                                _focusInterval -= 5;
-                              }
-                            });
-                          }),
-                      Text('${_focusInterval} minutes',
-                          style: Provider.of<ThemeProvider>(context).currentTheme == ThemeMode.dark
-                              ? CustomDarkTheme().textTheme.bodyLarge
-                              : CustomLightTheme().textTheme.bodyLarge),
-                      FloatingActionButton(
-                          heroTag: "fab2",
-                          child: Icon(Icons.add),
-                          onPressed: () {
-                            setState(() {
-                              if (_focusInterval <= 55) {
-                                _focusInterval += 5;
-                              }
-                            });
-                          }),
-                    ],
-                  ),
-                  Text('Set the duration for short breaks.',
-                      style: Provider.of<ThemeProvider>(context).currentTheme == ThemeMode.dark
-                          ? CustomDarkTheme().textTheme.bodyLarge
-                          : CustomLightTheme().textTheme.bodyLarge),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      FloatingActionButton(
-                          heroTag: "fab3",
-                          child: Icon(Icons.remove),
-                          onPressed: () {
-                            setState(() {
-                              if (_restDuration > 2) {
-                                _restDuration--;
-                              }
-                            });
-                          }),
-                      Text('${_restDuration} minutes',
-                          style:Provider.of<ThemeProvider>(context).currentTheme == ThemeMode.dark
-                              ? CustomDarkTheme().textTheme.bodyLarge
-                              : CustomLightTheme().textTheme.bodyLarge),
-                      FloatingActionButton(
-                          heroTag: "fab4",
-                          child: Icon(Icons.add),
-                          onPressed: () {
-                            setState(() {
-                              if (_restDuration < 5) {
-                                _restDuration++;
-                              }
-                            });
-                          }),
-                    ],
-                  ),
-                  Text('Set the duration for the long break.',
-                      style: Provider.of<ThemeProvider>(context).currentTheme == ThemeMode.dark
-                          ? CustomDarkTheme().textTheme.bodyLarge
-                          : CustomLightTheme().textTheme.bodyLarge),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      FloatingActionButton(
-                          heroTag: "fab5",
-                          child: Icon(Icons.remove),
-                          onPressed: () {
-                            setState(() {
-                              if (_longBreakDuration > 15) {
-                                _longBreakDuration -= 5;
-                              }
-                            });
-                          }),
-                      Text('${_longBreakDuration} minutes',
-                          style: Provider.of<ThemeProvider>(context).currentTheme == ThemeMode.dark
-                              ? CustomDarkTheme().textTheme.bodyLarge
-                              : CustomLightTheme().textTheme.bodyLarge),
-                      FloatingActionButton(
-                          heroTag: "fab6",
-                          child: Icon(Icons.add),
-                          onPressed: () {
-                            setState(() {
-                              if (_longBreakDuration < 35) {
-                                _longBreakDuration += 5;
-                              }
-                            });
-                          }),
-                    ],
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      //Navigator.push(context, MaterialPageRoute(builder: (context) =>  TimerScreen()));
-                    },
-                    child: Text(
-                      'Start focusing',
-                      style: TextStyle(fontSize: 18),
-
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Text(
+                  _questions[_currentQuestionIndex],
+                  style: Provider.of<ThemeProvider>(context).currentTheme == ThemeMode.dark
+                      ? CustomDarkTheme().textTheme.bodyLarge
+                      : CustomLightTheme().textTheme.bodyLarge,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    FloatingActionButton(
+                      heroTag: "fab1",
+                      child: Icon(Icons.remove),
+                      onPressed: () {
+                        setState(() {
+                          if (_currentQuestionIndex == 0 && _focusInterval > 5) {
+                            _focusInterval -= 5;
+                          } else if (_currentQuestionIndex == 1 && _restDuration > 2) {
+                            _restDuration--;
+                          } else if (_currentQuestionIndex == 2 && _longBreakDuration > 15) {
+                            _longBreakDuration -= 5;
+                          }
+                        });
+                      },
                     ),
-                  )
-                ]),
+                    Text(
+                      _currentQuestionIndex == 0
+                          ? '${_focusInterval} minutes'
+                          : _currentQuestionIndex == 1
+                          ? '${_restDuration} minutes'
+                          : '${_longBreakDuration} minutes',
+                      style: Provider.of<ThemeProvider>(context).currentTheme == ThemeMode.dark
+                          ? CustomDarkTheme().textTheme.bodyLarge
+                          : CustomLightTheme().textTheme.bodyLarge,
+                    ),
+                    FloatingActionButton(
+                      heroTag: "fab2",
+                      child: Icon(Icons.add),
+                      onPressed: () {
+                        setState(() {
+                          if (_currentQuestionIndex == 0 && _focusInterval <= 55) {
+                            _focusInterval += 5;
+                          } else if (_currentQuestionIndex == 1 && _restDuration < 5) {
+                            _restDuration++;
+                          } else if (_currentQuestionIndex == 2 && _longBreakDuration < 35) {
+                            _longBreakDuration += 5;
+                          }
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 95.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  if (_currentQuestionIndex < _questions.length - 1) {
+                                    _currentQuestionIndex++;
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                        pageBuilder: (context, animation, secondaryAnimation) => TimerScreen(
+                                          focusInterval: _focusInterval,
+                                          restDuration: _restDuration,
+                                          longBreakDuration: _longBreakDuration,
+                                        ),
+                                        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                          return FadeTransition(
+                                            opacity: animation,
+                                            child: child,
+                                          );
+                                        },
+                                      ),
+                                    );
+                                  }
+                                });
+                              },
+                              child: Text(
+                                _currentQuestionIndex < _questions.length - 1 ? 'Next' : 'Start focusing',
+                                style: TextStyle(fontSize: 18),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 20,),
+                    if (_currentQuestionIndex != 0)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 120.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    if (_currentQuestionIndex > 0) {
+                                      _currentQuestionIndex--;
+                                    }
+                                  });
+                                },
+                                child: Text(
+                                  'Previous',
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+
+              ],
+            ),
           ),
         ),
       ),
