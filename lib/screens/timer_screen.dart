@@ -15,7 +15,7 @@ class TimerScreen extends StatefulWidget {
     required this.focusInterval,
     required this.restDuration,
     required this.longBreakDuration,
-  })  : super(key: key);
+  }) : super(key: key);
 
   @override
   State<TimerScreen> createState() => _TimerScreenState();
@@ -34,22 +34,21 @@ class _TimerScreenState extends State<TimerScreen> {
     super.initState();
     controller = CountDownController();
     timerKey = UniqueKey();
-
   }
 
   int get currentDuration {
-    //TODO: multiplicar *60
     switch (currentPhase) {
       case TimerPhase.Focus:
-        return widget.focusInterval;
+        return widget.focusInterval*60;
       case TimerPhase.Rest:
-        return widget.restDuration;
+        return widget.restDuration*60;
       case TimerPhase.LongBreak:
-        return widget.longBreakDuration;
+        return widget.longBreakDuration*60;
     }
   }
 
   void _handleOnComplete() {
+    //TODO: Vibrar i disparar sons quan acabi cada franja
     switch (currentPhase) {
       case TimerPhase.Focus:
         cyclesCounter++;
@@ -83,6 +82,16 @@ class _TimerScreenState extends State<TimerScreen> {
     }
   }
 
+  String get currentPhaseText {
+    switch (currentPhase) {
+      case TimerPhase.Focus:
+        return 'Focus on your task';
+      case TimerPhase.Rest:
+        return 'Take a short rest';
+      case TimerPhase.LongBreak:
+        return 'Take a long rest';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,10 +103,12 @@ class _TimerScreenState extends State<TimerScreen> {
           IconButton(
             splashRadius: 1,
             onPressed: () {
-              final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+              final themeProvider =
+              Provider.of<ThemeProvider>(context, listen: false);
               themeProvider.toggleTheme();
             },
-            icon: Icon(Provider.of<ThemeProvider>(context).currentTheme == ThemeMode.dark
+            icon: Icon(Provider.of<ThemeProvider>(context).currentTheme ==
+                ThemeMode.dark
                 ? Icons.wb_sunny
                 : Icons.nights_stay),
           ),
@@ -107,30 +118,46 @@ class _TimerScreenState extends State<TimerScreen> {
         child: Padding(
           padding: const EdgeInsets.all(18.0),
           child: Center(
-            child: NeonCircularTimer(
-              key: timerKey,
-              width: 200,
-              isReverse: true,
-              duration: currentDuration,
-              controller: controller,
-              onComplete: _handleOnComplete,
-              isTimerTextShown: true,
-              innerFillGradient:
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                NeonCircularTimer(
+                  key: timerKey,
+                  width: 200,
+                  isReverse: true,
+                  duration: currentDuration,
+                  neon: 1,
+                  controller: controller,
+                  onComplete: _handleOnComplete,
+                  isTimerTextShown: true,
+                  strokeWidth: 20,
+
+                  innerFillGradient:
                   Provider.of<ThemeProvider>(context).currentTheme ==
-                          ThemeMode.dark
-                      ? LinearGradient(colors: [
-                          kLightBackground,
-                          kAccentColor,
-                        ])
-                      : LinearGradient(colors: [kDarkBackground, kAccentColor]),
-              neonColor: Provider.of<ThemeProvider>(context).currentTheme ==
                       ThemeMode.dark
-                  ? kAccentColor
-                  : kDarkBackground,
-              neumorphicEffect: false,
-              textStyle: Provider.of<ThemeProvider>(context).currentTheme == ThemeMode.dark
-                  ? CustomDarkTheme().textTheme.bodyLarge
-                  : CustomLightTheme().textTheme.bodyLarge,
+                      ? LinearGradient(colors: [
+                    kLightBackground,
+                    kAccentColor,
+                  ])
+                      : LinearGradient(colors: [kDarkBackground, kAccentColor]),
+                  neonColor: Provider.of<ThemeProvider>(context).currentTheme ==
+                      ThemeMode.dark
+                      ? kAccentColor
+                      : kDarkBackground,
+                  neumorphicEffect: false,
+                  textStyle: Provider.of<ThemeProvider>(context).currentTheme ==
+                      ThemeMode.dark
+                      ? CustomDarkTheme().textTheme.bodyLarge
+                      : CustomLightTheme().textTheme.bodyLarge,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 200.0),
+                  child: Text(currentPhaseText, style: Provider.of<ThemeProvider>(context).currentTheme ==
+                      ThemeMode.dark
+                      ? CustomDarkTheme().textTheme.bodyLarge
+                      : CustomLightTheme().textTheme.bodyLarge,),
+                ),
+              ],
             ),
           ),
         ),

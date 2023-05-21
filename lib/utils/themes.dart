@@ -54,15 +54,15 @@ ThemeData CustomLightTheme() {
     textTheme: base.textTheme.copyWith(
       bodyLarge: base.textTheme.bodyLarge?.copyWith(
         fontSize: 26,
-        color: Colors.black,
+        color: kDarkBackground,
       ),
       bodyMedium: base.textTheme.bodyMedium?.copyWith(
         fontSize: 18,
-        color: Colors.black,
+        color: kDarkBackground,
       ),
       bodySmall: base.textTheme.bodySmall?.copyWith(
         fontSize: 14,
-        color: Colors.black,
+        color: kDarkBackground,
       ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
